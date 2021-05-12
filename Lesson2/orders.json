@@ -1,0 +1,21 @@
+{
+    "buyer": [],
+    "orders": [
+        {
+            "item": "Macbook Pro m1 16Gb 1TB"
+        },
+        {
+            "quantity": 1
+        },
+        {
+            "price": 199990
+        },
+        {
+            "buyer": "Victor Pavlyuk"
+        },
+        {
+            "date": "17.12.2021"
+        }
+    ],
+    "lead": []
+}
