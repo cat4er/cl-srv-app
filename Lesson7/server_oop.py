@@ -49,7 +49,7 @@ class Chat(Thread):
 
     def leave(self):
         try:
-            client_list.pop(f'{self.guid}')
+            client_list.pop(self.guid)
             self.responce([self.guid, 200, f'Пользователь {self.user_name} вышел из чата'])
             time.sleep(1)
             self.client.close()
