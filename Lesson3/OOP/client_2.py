@@ -10,7 +10,7 @@ port = 8006
 
 # регистрация имени пользователя
 # name_in_chat = input('Введите ваше имя для входа в  чат:  ')
-name_in_chat = 'Алена'
+name_in_chat = 'Виктор'
 
 # создание псевдоуникального токена
 sys_info = platform.uname()
@@ -59,7 +59,7 @@ continuer = ''
 
 while continuer.upper() != 'Q':
     try:
-        ready = select.select([s], [], [], 1)
+        ready = select.select([s], [], [], 3)
         if ready[0]:
             msg = load_print(s)
             if msg.get('action') == 'rec_message':
@@ -93,7 +93,7 @@ while continuer.upper() != 'Q':
                 'user': f'{usr_data}'
             }
             send(s, get_list_msg)
-            data = load_print(s).get(f'{guid}').get('alert')
+            data = load_print(s).get(guid).get('alert')
             print(data)
         elif continuer == '2':
             to_guid = int(input('Введите кому пишем: '))
@@ -105,8 +105,7 @@ while continuer.upper() != 'Q':
                 'user': f'{usr_data}'
             }
             send(s, get_list_msg)
-            smsg = load_print(s)
-            to_user_name = smsg.get(f'{guid}').get('alert').get(f'{to_guid}')
+            to_user_name = load_print(s).get(guid).get('alert').get(to_guid)
             send_message_msg = {
                 'action': 'send_message',
                 'time': f'{time.time()}',
