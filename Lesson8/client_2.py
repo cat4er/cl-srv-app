@@ -92,26 +92,26 @@ def send_message(sock, guid, usr_data, group=None):
 
 
 def rec_message(sock, guid, event):
-    ready = select.select([sock], [], [], 1)
-    if ready[0]:
-        event.set()
-        msg = load_print(sock)
-        if msg.get('action') == 'rec_message':
-            print(f'У Вас новое сообщение от {msg.get("from_user_name")}:\n'
-                  f'{msg.get("message")}')
-            resp_msg = {
-                'responce': 200,
-                'action': 'send_message',
-                'time': f'{time.time()}',
-                'from_user_name': f'{name_in_chat}',
-                'from_guid': f'{guid}',
-                'to_user_name': f'{msg.get("from_user_name")}',
-                'to_guid': f'{msg.get("from_guid")}',
-                'alert': 'Сообщение доставлено'
-            }
-            send(sock, resp_msg)
-            event.join()
-
+    while True:
+        ready = select.select([sock], [], [], 1)
+        if ready[0]:
+            msg = load_print(sock)
+            if msg.get('action') == 'rec_message':
+                event.set()
+                print(f'У Вас новое сообщение от {msg.get("from_user_name")}:\n'
+                      f'{msg.get("message")}')
+                resp_msg = {
+                    'responce': 200,
+                    'action': 'send_message',
+                    'time': f'{time.time()}',
+                    'from_user_name': f'{name_in_chat}',
+                    'from_guid': f'{guid}',
+                    'to_user_name': f'{msg.get("from_user_name")}',
+                    'to_guid': f'{msg.get("from_guid")}',
+                    'alert': 'Сообщение доставлено'
+                }
+                send(sock, resp_msg)
+                event.join()
 
 
 def get_list(sock, guid, usr_data, group=None):
@@ -256,6 +256,7 @@ def main():
     started = Event()
     s, guid, usr_data = registration()
     t = Thread(target=rec_message, args=(s, guid, started))
+    t.daemon = True
     t.start()
     m = Thread(target=menu, args=(s, guid, usr_data, started))
     m.start()
