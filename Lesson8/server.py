@@ -82,11 +82,11 @@ class Chat(Thread):
                 elif action == 'send_message':
                     self.send_message(data)
                 elif action == 'rec_message':
-                    self.send_message(data)
+                    self.rec_message(data)
                 elif action == 'show_group':
                     self.responce(self.show_group())
                 elif action == 'open_group':
-                    self.responce(self.open_group())
+                    self.responce(self.open_group(None, data))
                 elif action == 'create_group':
                     self.responce(self.create_group(data))
                 elif action == 'exit_of_group':
@@ -128,15 +128,15 @@ class Chat(Thread):
 
     def open_group(self, group_id=None, data=None):
         """Метод открытия существующей группы"""
-        if group_id:
+        if group_id is not None:
             if client_list.get(self.guid).get('group') is None:
                 client_list.get(self.guid).update({'group': group_id})
                 self.group_id = group_id
             else:
                 return self.guid, 400, f'Пользователь уже участвует в гурппе {client_list.get(self.guid).get("group")}'
-        if data:
+        if data is not None:
             if client_list.get(self.guid).get('group') is None:
-                group_id = data.get("group_id")
+                group_id = data.get('group_id')
                 client_list.get(self.guid).update({'group': group_id})
                 self.group_id = group_id
                 return self.guid, 200, f'Группа {groups.get(group_id).get("group_name")} открыта для общения'
@@ -154,8 +154,8 @@ class Chat(Thread):
                             }
                 }
                 groups.update(new_group)
-                if self.open_group(gr_id):
-                    return self.open_group(gr_id)
+                if self.open_group(gr_id, None):
+                    return self.open_group(gr_id, None)
                 break
             else:
                 gr_id += 1
