@@ -7,7 +7,7 @@ import time
 from queue import PriorityQueue
 
 # config
-port = 8007
+port = 8006
 
 # регистрация имени пользователя
 # name_in_chat = input('Введите ваше имя для входа в  чат:  ')
@@ -81,7 +81,7 @@ def send_message(sock, guid, q, usr_data, group=None):
         message = 'Групповое:' + input('Введите ваше ссобщение: ')
         smsg = get_list(sock, guid, q,  usr_data)
         for to_guid, v in smsg.items():
-            if v.get('group') == f'{usr_group}':
+            if str(v.get('group')) == usr_group:
                 to_user_name = v.get('user_name')
                 send(sock, create_message(to_user_name, to_guid, message))
 
@@ -114,6 +114,16 @@ def rec_message(sock, guid, q):
                     'alert': 'Сообщение доставлено'
                 }
                 send(sock, resp_msg)
+        elif q.queue[0].get('action') == 'ping':
+            q.get()
+            resp_msg = {
+                'responce': 200,
+                'action': 'ping',
+                'time': f'{time.time()}',
+                'guid': f'{guid}',
+                'alert': 'я тут'
+            }
+            send(sock, resp_msg)
 
 
 def get_list(sock, guid, q, usr_data, group=None):

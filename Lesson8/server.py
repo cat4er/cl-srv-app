@@ -7,8 +7,9 @@ import ast
 import secrets
 from Crypto.Cipher import AES
 from base64 import b64encode, b64decode
+import select
 
-port = 8007
+port = 8006
 sessions = 10
 salt = 'SlTKeYOpHygTYkP3'
 client_list = {}  # клиенты и их атрибуты
@@ -34,7 +35,7 @@ class Chat(Thread):
         print(f'Запуск потока для {self.name, self.token,}')
         self.main()
 
-    def responce(self, data):
+    def response(self, data):
         """Метод отправки унифицированного ответа"""
         answer = {data[0]:
             {
@@ -54,12 +55,12 @@ class Chat(Thread):
         """Метод выхода из чата(закрывает сокет, удаляет клиентскую запись, убивает экземпляр класса и поток)"""
         try:
             client_list.pop(self.guid)
-            self.responce([self.guid, 200, f'Пользователь {self.user_name} вышел из чата'])
+            self.response([self.guid, 200, f'Пользователь {self.user_name} вышел из чата'])
             time.sleep(1)
             self.client.close()
             del self
         except:
-            self.responce([self.guid, 400, 'Ошибка запроса выхода из чата'])
+            self.response([self.guid, 400, 'Ошибка запроса выхода из чата'])
 
     def __del__(self):
         """нотификация о закрытии сессии"""
@@ -78,19 +79,19 @@ class Chat(Thread):
                     self.leave()
                     exit()
                 elif action == 'get_user_list':
-                    self.responce(self.get_user_list())
+                    self.response(self.get_user_list())
                 elif action == 'send_message':
                     self.send_message(data)
                 elif action == 'rec_message':
                     self.rec_message(data)
                 elif action == 'show_group':
-                    self.responce(self.show_group())
+                    self.response(self.show_group())
                 elif action == 'open_group':
-                    self.responce(self.open_group(None, data))
+                    self.response(self.open_group(None, data))
                 elif action == 'create_group':
-                    self.responce(self.create_group(data))
+                    self.response(self.create_group(data))
                 elif action == 'exit_of_group':
-                    self.responce(self.exit_of_group())
+                    self.response(self.exit_of_group())
             else:
                 print('Такой команды в списке доступных')
 
@@ -172,26 +173,29 @@ class Chat(Thread):
     #     pass
 
 
-# def check_user(self):
-"""Проверяет доступен ли клиент на сервере, и если нет, то закрывает сокет, 
-удаляет клиентскую запись, экземплятр класса и поток"""
+def check_user():
+    """Проверяет доступен ли клиент на сервере, и если нет, то закрывает сокет,
+    удаляет клиентскую запись, экземплятр класса и поток"""
+    while True:
+        for guid, v in client_list.items():
+            token = v.get('token')
+            client = v.get('socket')
+            ping = {
+                'action': 'ping',
+                'time': f'{time.time()}',
+                guid: token}
+            client.send(pickle.dumps(json.dumps(ping)))
 
-
-#     ping = {
-#         'action': 'ping',
-#         'time': f'{time.time()}',
-#         'user': {
-#             f'{hash_usr_data}': f'{name_in_chat}'
-#         }
-#     }
-#     for k, v in client_list.items():
-#         v[0].send(pickle.dumps(json.dumps(ping)))
-#         time.sleep(60)
-#         try:
-#             responce = json.loads(pickle.loads(v[0].recv(2048)))
-#         except:
-#             v[0].close()
-#             client_list.pop(k)
+            time.sleep(10)
+            try:
+                ready = select.select([client], [], [], 5)
+                if ready[0]:
+                    response = json.loads(pickle.loads(client.recv(2048)))
+                    if response.get('response') == 200 and response.get('action') == 'ping':
+                        pass
+            except:
+                client.close()
+                client_list.pop(guid)
 
 
 def tokenization(data):
@@ -219,8 +223,8 @@ def registration(client, data):
             new_user = {
                 guid: {'user_name': f'{user_name}',
                        'socket': client,
-                       'token': f'{token}',
-                       'pub_key': f'{key}',
+                       'token': token,
+                       'pub_key': key,
                        'group': None,
                        }
             }
@@ -261,6 +265,9 @@ def main(testing=False):
 
         receive_data = json.loads(pickle.loads(client.recv(2048)))
         registration(client, receive_data)
+        p = Thread(target=check_user)
+        p.daemon = True
+        p.start()
     else:
         while True:
             if client is None:
