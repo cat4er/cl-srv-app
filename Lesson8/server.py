@@ -177,25 +177,25 @@ def check_user():
     """Проверяет доступен ли клиент на сервере, и если нет, то закрывает сокет,
     удаляет клиентскую запись, экземплятр класса и поток"""
     while True:
-        for guid, v in client_list.items():
-            token = v.get('token')
-            client = v.get('socket')
-            ping = {
-                'action': 'ping',
-                'time': f'{time.time()}',
-                guid: token}
-            client.send(pickle.dumps(json.dumps(ping)))
-
-            time.sleep(10)
-            try:
-                ready = select.select([client], [], [], 5)
-                if ready[0]:
-                    response = json.loads(pickle.loads(client.recv(2048)))
-                    if response.get('response') == 200 and response.get('action') == 'ping':
-                        pass
-            except:
-                client.close()
-                client_list.pop(guid)
+        if client_list:
+            for guid, v in client_list.items():
+                token = v.get('token')
+                client = v.get('socket')
+                ping = {
+                    'action': 'ping',
+                    'time': f'{time.time()}',
+                    guid: token}
+                client.send(pickle.dumps(json.dumps(ping)))
+                try:
+                    ready = select.select([client], [], [], 5)
+                    if ready[0]:
+                        response = json.loads(pickle.loads(client.recv(2048)))
+                        if response.get('response') == 200 and response.get('action') == 'ping':
+                            time.sleep(10)
+                except:
+                    client.close()
+                    client_list.pop(guid)
+                    time.sleep(10)
 
 
 def tokenization(data):

@@ -96,15 +96,16 @@ def send_message(sock, guid, q, usr_data, group=None):
 def rec_message(sock, guid, q):
     while True:
         q.put(load_print(sock))
-        if q.queue[0].get('action') == 'rec_message':
+        req = q.queue[0].get('action')
+        if req == 'rec_message':
             msg = q.get()
-            if msg.get('responce') == 200:
+            if msg.get('response') == 200:
                 pass
-            elif 'responce' not in msg:
+            elif 'response' not in msg:
                 print(f'У Вас новое сообщение от {msg.get("from_user_name")}:\n'
                       f'{msg.get("message")}')
                 resp_msg = {
-                    'responce': 200,
+                    'response': 200,
                     'action': 'send_message',
                     'time': f'{time.time()}',
                     'from_user_name': f'{name_in_chat}',
@@ -114,16 +115,18 @@ def rec_message(sock, guid, q):
                     'alert': 'Сообщение доставлено'
                 }
                 send(sock, resp_msg)
-        elif q.queue[0].get('action') == 'ping':
+        elif req == 'ping':
             q.get()
             resp_msg = {
-                'responce': 200,
+                'response': 200,
                 'action': 'ping',
                 'time': f'{time.time()}',
                 'guid': f'{guid}',
                 'alert': 'я тут'
             }
             send(sock, resp_msg)
+        else:
+            pass
 
 
 def get_list(sock, guid, q, usr_data, group=None):
