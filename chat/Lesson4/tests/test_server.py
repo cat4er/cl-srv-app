@@ -2,7 +2,7 @@
 # в отдельных скриптах с префиксом test_ в имени файла (например, test_client.py).
 
 import unittest
-from Lesson4.server import authenticate, leave, request, responce, main
+from chat.Lesson4.server import authenticate, leave, request, responce, main
 
 """Для прохождения тестов, нужно запускать клиента (client1) в окружении test и сервер (server) в  test"""
 

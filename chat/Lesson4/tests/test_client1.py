@@ -2,7 +2,7 @@
 # в отдельных скриптах с префиксом test_ в имени файла (например, test_client.py).
 
 import unittest
-from Lesson4.client1 import send, load_print, s as sock
+from chat.Lesson4.client1 import send, load_print, s as sock
 
 """Для прохождения тестов, нужно запускать серверное приложение (server) в окружении prod, a (client) в  test"""
 
