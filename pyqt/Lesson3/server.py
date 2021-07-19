@@ -154,9 +154,30 @@ class DataBase:
         event_list = session.query(Contact).filter_by(user_id=guid).all()
         return event_list
 
-    def add_new_group(self):
+    def add_new_group(self, group_name, owner_user_id, added_user_id, create_time=datetime.now()):
         """метод добавления новой группы в БД"""
-        pass
+        new_group = Group(group_name=group_name, owner_user_id=owner_user_id,
+                          added_user_id=added_user_id, create_time=create_time)
+        session.add(new_group)
+        session.commit()
+        self.update_user_group(owner_user_id)
+        return new_group
+
+    @staticmethod
+    def update_user_group(user_id):
+        update_user = session.query(User).get(id=user_id)
+        update_user.user_group = session.query(Group).get(owner_user_id=user_id).group_id
+        session.add(update_user)
+        session.commit()
+        return update_user
+
+    @staticmethod
+    def clean_all_table():
+        session.query(User).delete()
+        session.query(Group).delete()
+        session.query(Message).delete()
+        session.query(History).delete()
+        session.query(Contact).delete()
 
     def open_group(self):
         """метод добавления нового пользователя в группу"""
@@ -164,7 +185,8 @@ class DataBase:
 
     def get_groups(self):
         """метод получения групп из БД"""
-        pass
+        group_list = session.query(Group).all()
+        return group_list
 
     def exit_group(self):
         """метод выхода пользователя из группы"""
@@ -267,8 +289,8 @@ class Chat(Thread):
                     print('Что-то пользователь химичит')
                     self.save_event(event_type='registration')
                 elif action == 'leave':
-                    self.leave()
                     self.save_event(event_type='leave')
+                    self.leave()
                     exit()
                 elif action == 'get_user_list':
                     self.response(self.get_user_list())
@@ -293,7 +315,7 @@ class Chat(Thread):
                 print('Такой команды в списке доступных')
 
     def save_event(self, event_type):
-        db.add_new_event(user_id=self.guid, event_type=event_type, ip_address=socket_list.get(self.guid).getsockname()[0])
+        db.add_new_event(user_id=self.guid, event_type=event_type, ip_address=self.client.getsockname()[0])
 
     def get_user_list(self):
         """Метод возвращает список доступных пользователей чата"""
@@ -310,7 +332,7 @@ class Chat(Thread):
         print(data)
         db.save_message(from_user_id=data.get('from_guid'), to_user_id=data.get('to_guid'), text_message=data.get('message'))
         to_client.send(json.dumps(data).encode())
-        db.add_contact(user_id=self.guid, contact_with=data.get('to_guid'), token=self.token )
+        db.add_contact(user_id=self.guid, contact_with=data.get('to_guid'), token=self.token)
 
     @staticmethod
     def rec_message(data):
@@ -324,18 +346,21 @@ class Chat(Thread):
     def show_group(self):
         """Метод отображения доступных групп"""
         group_list = {}
-        for i, v in groups.items():
-            group_list.update({i: v.get('group_name')})
+        # for i, v in groups.items():
+        #     group_list.update({i: v.get('group_name')})
+        for i in db.get_groups():
+            group_list.update({i.group_name: i.owner_user_id})
         return self.guid, 200, group_list
 
     def open_group(self, group_id=None, data=None):
         """Метод открытия существующей группы"""
         if group_id is not None:
-            if client_list.get(self.guid).get('group') is None:
-                client_list.get(self.guid).update({'group': group_id})
-                self.group_id = group_id
+            for i in db.get_groups():
+                if i.owner_user_id == self.guid and i.group_id is None:
+                    db.update_user_group(self.guid)
+                    self.group_id = i.group_id
             else:
-                return self.guid, 400, f'Пользователь уже участвует в гурппе {client_list.get(self.guid).get("group")}'
+                return self.guid, 400, f'Пользователь уже участвует в гурппе {i.group_name}'
         if data is not None:
             if client_list.get(self.guid).get('group') is None:
                 group_id = data.get('group_id')
@@ -349,13 +374,7 @@ class Chat(Thread):
         while True:
             if gr_id not in groups.keys():
                 group_name = data.get("user_group")
-                new_group = {
-                    gr_id: {'group_name': group_name,
-                            'owner_id': self.guid,
-                            'owner_name': self.user_name,
-                            }
-                }
-                groups.update(new_group)
+                db.add_new_group(group_name=group_name, owner_user_id=self.guid, added_user_id=self.guid)
                 if self.open_group(gr_id, None):
                     return self.open_group(gr_id, None)
                 break
@@ -436,6 +455,8 @@ class Main:
 
         guid = 1
         while guid <= self.sessions:
+            if not socket_list:
+                db.clean_all_table()
             if guid not in socket_list.keys():
                 new_user = {guid: client}
                 socket_list.update(new_user)
@@ -485,15 +506,6 @@ class Main:
 
 if __name__ == "__main__":
     db = DataBase()
-    # db.add_new_user(
-    #     guid=2,
-    #     user_name='max',
-    #     token='32e2d224',
-    #     key='s23d',
-    #     user_group=None,
-    # )
-    # res = db.get_clients_list()
-    # print(res)
     serv = Main(client_list, sessions, salt)
     serv.port = 8007
     serv.run()
