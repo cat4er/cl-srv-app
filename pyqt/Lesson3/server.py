@@ -13,14 +13,13 @@ from functools import wraps
 import inspect
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, Boolean, Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime, Enum
 from sqlalchemy.ext.declarative import declarative_base
 
-sessions = 10
+
 salt = 'SlTKeYOpHygTYkP3'
 client_list = None  # клиенты и их атрибуты
 socket_list = {}
-groups = {}  # группы клиентов
 
 Base = declarative_base()
 
@@ -28,8 +27,9 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, index=True)
-    user_name = Column(String)
+    user_name = Column(String, index=True)
     pub_key = Column(String)
+    user_status = Column(Enum('online', 'offline'))
     token = Column(String, index=True, unique=True)
     user_group = Column(ForeignKey('groups.group_id'))
     create_time = Column(DateTime)
@@ -40,7 +40,6 @@ class Group(Base):
     group_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     group_name = Column(String, index=True)
     owner_user_id = Column(ForeignKey('users.id'))
-    added_user_id = Column(ForeignKey('users.id'))
     create_time = Column(DateTime)
 
 
@@ -83,30 +82,41 @@ class DataBase:
     """Класс методов по управлению хранилищем"""
 
     @staticmethod
-    def add_new_user(guid, user_name, token, key, user_group, create_time=datetime.now()):
+    def add_new_user(guid, user_name, user_status, token, key, user_group, create_time=datetime.now()):
         """метод добавления нового пользователя в БД"""
-        new_user = User(id=guid, user_name=user_name, token=token, pub_key=key, user_group=user_group,
+        new_user = User(id=guid, user_name=user_name, user_status=user_status, token=token, pub_key=key, user_group=user_group,
                         create_time=create_time)
         session.add(new_user)
         session.commit()
 
     @staticmethod
-    def get_clients_list():
-        global client_list
-        """метод получения пользователей из БД со всеми параметрами"""
-        clients_list = session.query(User).all()
-        client_list = clients_list
-        return clients_list
+    def update_user_data(user_id, column, value):
+        """метод обновления пользователей из БД со всеми параметрами"""
+        update_user = session.query(User).get(user_id)
+        if column == 'user_status':
+            update_user.user_status = value
+        elif column == 'user_group':
+            update_user.user_group = value
+        elif column == 'token':
+            update_user.token = value
+        session.add(update_user)
+        session.commit()
 
     @staticmethod
-    def get_client(guid):
+    def get_user_list():
+        """метод получения пользователей из БД со всеми параметрами"""
+        user_list = session.query(User).all()
+        return user_list
+
+    @staticmethod
+    def get_user(guid):
         """метод получения пользователя из БД"""
         client = session.query(User).filter_by(id=guid).first()
         return client
 
     def del_user(self, guid):
         """метод удаления пользователя из БД"""
-        del_user = self.get_client(guid)
+        del_user = self.get_user(guid)
         session.delete(del_user)
         session.commit()
         return del_user
@@ -154,22 +164,13 @@ class DataBase:
         event_list = session.query(Contact).filter_by(user_id=guid).all()
         return event_list
 
-    def add_new_group(self, group_name, owner_user_id, added_user_id, create_time=datetime.now()):
+    @staticmethod
+    def add_new_group(group_name, owner_user_id, create_time=datetime.now()):
         """метод добавления новой группы в БД"""
-        new_group = Group(group_name=group_name, owner_user_id=owner_user_id,
-                          added_user_id=added_user_id, create_time=create_time)
+        new_group = Group(group_name=group_name, owner_user_id=owner_user_id, create_time=create_time)
         session.add(new_group)
         session.commit()
-        self.update_user_group(owner_user_id)
         return new_group
-
-    @staticmethod
-    def update_user_group(user_id):
-        update_user = session.query(User).get(id=user_id)
-        update_user.user_group = session.query(Group).get(owner_user_id=user_id).group_id
-        session.add(update_user)
-        session.commit()
-        return update_user
 
     @staticmethod
     def clean_all_table():
@@ -179,18 +180,28 @@ class DataBase:
         session.query(History).delete()
         session.query(Contact).delete()
 
-    def open_group(self):
-        """метод добавления нового пользователя в группу"""
-        pass
-
-    def get_groups(self):
+    @staticmethod
+    def get_groups_list():
         """метод получения групп из БД"""
         group_list = session.query(Group).all()
         return group_list
 
-    def exit_group(self):
-        """метод выхода пользователя из группы"""
-        pass
+    @staticmethod
+    def get_group(column, value):
+        """метод получения группы из БД"""
+        if column == 'group_id':
+            group = session.query(Group).filter_by(group_id=value).first()
+        if column == 'group_name':
+            group = session.query(Group).filter_by(group_name=value).first()
+        return group
+
+    @staticmethod
+    def del_group(group_id):
+        """метод удаления группы"""
+        group = session.query(Group).filter_by(group_id=group_id).first()
+        session.delete(group)
+        session.commit()
+        return group
 
 
 def log(func):
@@ -239,7 +250,6 @@ class Chat(Thread):
         self.name = name
         self.token = token
         self.guid = guid
-        self.group_id = None
 
     def run(self):
         """Запуск потока"""
@@ -266,7 +276,7 @@ class Chat(Thread):
         """Метод выхода из чата(закрывает сокет, удаляет клиентскую запись, убивает экземпляр класса и поток)"""
         try:
             socket_list.pop(self.guid)
-            db.del_user(self.guid)
+            db.update_user_data(self.guid, 'user_status', 'offline')
             self.response([self.guid, 200, f'Пользователь {self.user_name} вышел из чата'])
             time.sleep(1)
             self.client.close()
@@ -320,8 +330,9 @@ class Chat(Thread):
     def get_user_list(self):
         """Метод возвращает список доступных пользователей чата"""
         online_list = {}
-        for i in db.get_clients_list():
-            online_list.update({i.id: {'user_name': i.user_name, 'group': i.user_group}})
+        for i in db.get_user_list():
+            if i.user_status == 'online':
+                online_list.update({i.id: {'user_name': i.user_name, 'group': i.user_group}})
         return self.guid, 200, online_list
 
     def send_message(self, data):
@@ -330,7 +341,12 @@ class Chat(Thread):
         to_client = (socket_list.get(int(data.get('to_guid'))))
         data.update({'action': 'rec_message'})
         print(data)
-        db.save_message(from_user_id=data.get('from_guid'), to_user_id=data.get('to_guid'), text_message=data.get('message'))
+        if data.get('message'):
+            db.save_message(from_user_id=data.get('from_guid'), to_user_id=data.get('to_guid'),
+                            text_message=data.get('message'))
+        elif data.get('alert'):
+            db.save_message(from_user_id=data.get('from_guid'), to_user_id=data.get('to_guid'),
+                            text_message=data.get('alert'))
         to_client.send(json.dumps(data).encode())
         db.add_contact(user_id=self.guid, contact_with=data.get('to_guid'), token=self.token)
 
@@ -346,48 +362,42 @@ class Chat(Thread):
     def show_group(self):
         """Метод отображения доступных групп"""
         group_list = {}
-        # for i, v in groups.items():
-        #     group_list.update({i: v.get('group_name')})
-        for i in db.get_groups():
-            group_list.update({i.group_name: i.owner_user_id})
+        for i in db.get_groups_list():
+            group_list.update({i.group_id: {'название группы': i.group_name, 'владелец группы': i.owner_user_id}})
         return self.guid, 200, group_list
 
     def open_group(self, group_id=None, data=None):
         """Метод открытия существующей группы"""
-        if group_id is not None:
-            for i in db.get_groups():
-                if i.owner_user_id == self.guid and i.group_id is None:
-                    db.update_user_group(self.guid)
-                    self.group_id = i.group_id
-            else:
-                return self.guid, 400, f'Пользователь уже участвует в гурппе {i.group_name}'
-        if data is not None:
-            if client_list.get(self.guid).get('group') is None:
-                group_id = data.get('group_id')
-                client_list.get(self.guid).update({'group': group_id})
-                self.group_id = group_id
-                return self.guid, 200, f'Группа {groups.get(group_id).get("group_name")} открыта для общения'
+        if data:
+            group_id = data.get('group_id')
+        if db.get_user(self.guid).user_group is None:
+            db.update_user_data(self.guid, 'user_group', group_id)
+            return self.guid, 200, f'Группа {db.get_group("group_id",group_id ).group_name} открыта для общения'
+        else:
+            return self.guid, 400, f'Пользователь уже участвует в гурппе {db.get_group("group_id",group_id ).group_name}'
 
     def create_group(self, data):
         """Метод создания группы"""
-        gr_id = 1
-        while True:
-            if gr_id not in groups.keys():
-                group_name = data.get("user_group")
-                db.add_new_group(group_name=group_name, owner_user_id=self.guid, added_user_id=self.guid)
-                if self.open_group(gr_id, None):
-                    return self.open_group(gr_id, None)
-                break
-            else:
-                gr_id += 1
-        return self.guid, 200, f'Группа {groups.get(gr_id).get("group_name")} готова для общения'
+        for i in db.get_groups_list():
+            if i.owner_user_id == self.guid:
+                return self.guid, 400, f'Пользователь уже участвует в гурппе {i.group_name}'
+        group_name = data.get("user_group")
+        db.add_new_group(group_name=group_name, owner_user_id=self.guid)
+        self.open_group(group_id=db.get_group("group_name", group_name).group_id)
+        return self.guid, 200, f'Группа {group_name} готова для общения'
 
     @log
     def exit_of_group(self):
         """Метод выхода из группы"""
-        group_id = client_list.get(self.guid).get('group')
-        client_list.get(self.guid).update({'group': None})
-        return self.guid, 200, f'Вы вышли из группы {group_id}'
+        group = db.get_user(self.guid).user_group
+        if group is not None:
+            db.update_user_data(self.guid, 'user_group', None)
+            for i in db.get_groups_list():
+                if i.owner_user_id == self.guid:
+                    db.del_group(group)
+            return self.guid, 200, f'Вы вышли из группы {group}'
+        else:
+            return self.guid, 400, 'Пользователь не участвуют в группах'
 
     # def check_token():
     """Проверят выданный клиенту токен в каждом реквесте перед обработкой"""
@@ -397,8 +407,7 @@ class Chat(Thread):
 class Main:
     port = Port()
 
-    def __init__(self, cl_list, sess, slt):
-        self.sessions = sess
+    def __init__(self, cl_list, slt):
         self.salt = slt
         self.client_list = cl_list  # клиенты и их атрибуты
 
@@ -411,22 +420,26 @@ class Main:
         удаляет клиентскую запись, экземплятр класса и поток"""
         while True:
             if socket_list:
-                for guid, client in socket_list.items():
-                    ping = {
-                        'action': 'ping',
-                        'time': f'{time.time()}',
-                        'user': guid}
-                    client.send(json.dumps(ping))
-                    try:
-                        ready = select.select([client], [], [], 5)
-                        if ready[0]:
-                            response = json.loads(client.recv(2048).decode())
-                            if response.get('response') == 200 and response.get('action') == 'ping':
-                                time.sleep(10)
-                    except:
-                        client.close()
-                        socket_list.pop(guid)
-                        time.sleep(10)
+                try:
+                    for guid, client in socket_list.items():
+                        ping_msg = {
+                            'action': 'ping',
+                            'time': f'{time.time()}',
+                            'user': guid}
+                        client.send(json.dumps(ping_msg).encode())
+                        try:
+                            ready = select.select([client], [], [], 5)
+                            if ready[0]:
+                                response = json.loads(client.recv(2048).decode())
+                                if response.get('response') == 200 and response.get('action') == 'ping':
+                                    time.sleep(10)
+                        except:
+                            client.close()
+                            socket_list.pop(guid)
+                            db.update_user_data(guid, 'user_status', 'offline')
+                            time.sleep(10)
+                except RuntimeError:
+                    break
 
     def tokenization(self, data):
         """Создание уникального токена, буду использовать для проверки сообщений нужному клиенту"""
@@ -454,16 +467,17 @@ class Main:
         token, key = self.tokenization(data)
 
         guid = 1
-        while guid <= self.sessions:
-            if not socket_list:
-                db.clean_all_table()
-            if guid not in socket_list.keys():
-                new_user = {guid: client}
-                socket_list.update(new_user)
-                if db.get_client(guid):
-                    db.del_user(guid)
-                if not db.get_client(guid):
-                    db.add_new_user(guid, user_name, token, key, None)
+        while True:
+            i = db.get_user(guid)
+            if i is None:
+                db.add_new_user(guid, user_name, 'online', token, key, None)
+                socket_list.update({guid: client})
+                break
+            elif i.user_name == user_name:
+                db.update_user_data(guid, 'user_status', 'online')
+                db.update_user_data(guid, 'token', token)
+                socket_list.update({guid: client})
+                print(f'пользователь {user_name, token} уже есть, статус онлайн')
                 break
             else:
                 guid += 1
@@ -479,34 +493,27 @@ class Main:
 
         self.create_thread(guid, token, key, client, user_name)
 
-    def main(self, testing=False):
+    def main(self):
         """Задача функции: открыть сессию, зарегистрировать пользователя"""
         s = socket(AF_INET, SOCK_STREAM)  # Создает сокет TCP
         s.bind(('localhost', self.port))  # Присваивает порт
-        s.listen(self.sessions)  # Ограничивает кол-во сессий
+        s.listen()
         client = None
-        if testing:
+        # p = Thread(target=self.check_user)
+        # p.daemon = True
+        # p.start()
+        while True:
             if client is None:
                 client = s.accept()[0]
 
             receive_data = json.loads(client.recv(2048).decode())
             self.registration(client, receive_data)
-            p = Thread(target=self.check_user)
-            p.daemon = True
-            p.start()
-        else:
-            while True:
-                if client is None:
-                    client = s.accept()[0]
-
-                receive_data = json.loads(client.recv(2048).decode())
-                self.registration(client, receive_data)
-                client = None
+            client = None
 
 
 if __name__ == "__main__":
     db = DataBase()
-    serv = Main(client_list, sessions, salt)
+    serv = Main(client_list, salt)
     serv.port = 8007
     serv.run()
 
