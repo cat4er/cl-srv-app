@@ -1,3 +1,4 @@
+import time
 from socket import *
 from threading import Thread
 import platform
@@ -106,8 +107,13 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
         self.setupUi(self)
         self.commandLinkButton_2.clicked.connect(self.update_contact_list)
         self.commandLinkButton.clicked.connect(self.send_message)
+        self.lineEdit.returnPressed.connect(self.send_message)
         self.user_chat = None
+        self.user_name = None
         self.listWidget.itemDoubleClicked.connect(self.open_chat)
+        r = Thread(target=self.rec_message, daemon=True)
+        r.start()
+        self.update_contact_list()
 
     def update_contact_list(self):
         req = {'action': 'get_list',
@@ -120,8 +126,9 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
             layout = QVBoxLayout()
             for k, v in data.items():
                 item = QListWidgetItem()
-                item.setText(f'{v.get("user_name")}')
                 item.guid = int(k)
+                item.name = self.user_name = v.get("user_name")
+                item.setText(f'{self.user_name}')
                 icon = QtGui.QIcon()
                 icon.addPixmap(QtGui.QPixmap("user.png"),
                                QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -137,22 +144,23 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
     def open_chat(self):
         self.listWidget_2.clear()
         if self.listWidget:
-            guid = self.listWidget.currentItem().guid
+            self.user_chat = self.listWidget.currentItem().guid
+            self.user_name = self.listWidget.currentItem().name
             req = {'action': 'read_messages',
-                   'guid': guid,
+                   'guid': self.user_chat,
                    'time': f'{datetime.now()}'}
             front_input_queue.put(req)
             res = front_output_queue.get()
             for i in res:
-                if i.from_user_id == guid:
-                    text_mes = QListWidgetItem()
-                    text_mes.setText(f'{i.text_message}')
-                    text_mes.setTextAlignment(QtCore.Qt.AlignRight)
-                    self.listWidget_2.addItem(text_mes)
-                elif i.to_user_id == guid:
+                if i.from_user_id == self.user_chat:
                     text_mes = QListWidgetItem()
                     text_mes.setText(f'{i.text_message}')
                     text_mes.setTextAlignment(QtCore.Qt.AlignLeft)
+                    self.listWidget_2.addItem(text_mes)
+                elif i.to_user_id == self.user_chat:
+                    text_mes = QListWidgetItem()
+                    text_mes.setText(f'{i.text_message}')
+                    text_mes.setTextAlignment(QtCore.Qt.AlignRight)
                     self.listWidget_2.addItem(text_mes)
 
             layout = QVBoxLayout()
@@ -163,12 +171,45 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
                 self, 'Error', 'Упс, что-то пошло не так')
 
     def send_message(self):
-        pass
+        message_text = self.lineEdit.text()
+        if message_text:
+            req = {'action': 'send_message',
+                   'message_text': message_text,
+                   'to_user_id': self.user_chat,
+                   'to_user_name': self.user_name,
+                   'time': f'{datetime.now()}'}
+            front_input_queue.put(req)
+            self.lineEdit.clear()
+            resp = front_output_queue.get()
+            if resp.get('response') == 200:
+                self.open_chat()
+        else:
+            QMessageBox.warning(
+                self, 'Error', 'Введите сообщение')
+
+    def rec_message(self):
+        while True:
+            try:
+                req = front_output_queue.queue[0]
+                if req.get('action') == 'rec_message':
+                    request = front_output_queue.get()
+                    from_user_name = request.get("from_user_name")
+                    from_guid = request.get("from_user_id")
+                    message = request.get("message_text")
+                    QMessageBox.information(
+                        self, 'Message', f'У Вас новое сообщение от {from_user_name}:{message}')
+                    if self.user_chat == int(from_guid):
+                        self.open_chat()
+                else:
+                    pass
+            except IndexError:
+                time.sleep(1)
 
 
-class Login(QDialog):
+class Login(QDialog, QMainWindow, userapp.Ui_MainWindow):
     def __init__(self, parent=None):
         super(Login, self).__init__(parent)
+        self.retranslateUi(self)
         self.setWindowTitle('Введите логин')
         self.textName = QLineEdit(self)
         # self.textPass = QLineEdit(self)
@@ -184,6 +225,7 @@ class Login(QDialog):
             user_name = self.textName.text()
             msg = {'action': 'registration',
                    'time': f'{datetime.now()}',
+                   'group': None,
                    'user_name': user_name}
             front_input_queue.put(msg)
             resp = front_output_queue.get()
@@ -259,7 +301,10 @@ class Client:
                 front_output_queue.put(resp_msg)
                 print('Ошибка регистарции')
 
-    def send_message(self, group=None):
+    def send_message(self, request, group=None):
+        to_user_name = request.get("to_user_name")
+        to_guid = request.get("to_user_id")
+        message = request.get("message_text")
 
         def create_message(*args):
             send_message_msg = {
@@ -267,28 +312,34 @@ class Client:
                 'time': f'{datetime.now()}',
                 'from_user_name': f'{self.name_in_chat}',
                 'from_guid': f'{self.guid}',
-                'to_user_name': f'{to_user_name}',
-                'to_guid': f'{to_guid}',
-                'message': f'{message}',
+                'to_user_name': to_user_name,
+                'to_guid': to_guid,
+                'message': message,
             }
             return send_message_msg
 
         if group is None:
-            to_guid = int(input('Введите кому пишем: '))
-            message = 'Личное:' + input('Введите ваше ссобщение: ')
-            smsg = self.get_list()
-            to_user_name = smsg.get(f'{to_guid}').get('user_name')
+            # to_guid = int(input('Введите кому пишем: '))
+            # message = 'Личное:' + input('Введите ваше ссобщение: ')
+            # smsg = self.get_list()
+            # to_user_name = smsg.get(f'{to_guid}').get('user_name')
+            front_reg_resp_msg = {
+                'action': 'send_message',
+                'time': f'{datetime.now()}',
+                'response': 200,
+            }
+            front_output_queue.put(front_reg_resp_msg)
             self.db.save_message(from_user_id=self.guid, to_user_id=to_guid, text_message=message)
             self.send(create_message(to_user_name, to_guid, message))
 
-        elif group is not None:
-            message = 'Групповое:' + input('Введите ваше ссобщение: ')
-            smsg = self.get_list()
-            for to_guid, v in smsg.items():
-                if str(v.get('group')) == self.usr_group:
-                    to_user_name = v.get('user_name')
-                    self.db.save_message(from_user_id=self.guid, to_user_id=to_guid, text_message=message)
-                    self.send(create_message(to_user_name, to_guid, message))
+        # elif group is not None:
+        #     message = 'Групповое:' + input('Введите ваше ссобщение: ')
+        #     smsg = self.get_list()
+        #     for to_guid, v in smsg.items():
+        #         if str(v.get('group')) == self.usr_group:
+        #             to_user_name = v.get('user_name')
+        #             self.db.save_message(from_user_id=self.guid, to_user_id=to_guid, text_message=message)
+        #             self.send(create_message())
 
     def front_api(self):
         while True:
@@ -328,9 +379,13 @@ class Client:
                     from_user_name = msg.get("from_user_name")
                     from_guid = msg.get("from_guid")
                     message = msg.get("message")
+                    req = {'action': 'rec_message',
+                           'message_text': message,
+                           'from_user_id': from_guid,
+                           'from_user_name': from_user_name,
+                           'time': f'{datetime.now()}'}
+                    front_output_queue.put(req)
                     self.db.save_message(from_user_id=from_guid, to_user_id=self.guid, text_message=message)
-                    print(f'У Вас новое сообщение от {from_user_name}:\n'
-                          f'{message}')
                     resp_msg = {
                         'response': 200,
                         'action': 'send_message',
@@ -416,7 +471,7 @@ class Client:
             for i, value in groups.items():
                 if i == group_id:
                     self.db.add_new_group(group_id=i, group_name=value.get('название группы'),
-                                     owner_user_id=value.get('владелец группы'))
+                                          owner_user_id=value.get('владелец группы'))
             self.usr_group = group_id
         print(data.get('alert'))
 
