@@ -21,7 +21,7 @@ import userapp
 front_input_queue = PriorityQueue()
 front_output_queue = PriorityQueue()
 # config
-PORT = 8007
+PORT = 8009
 
 Base = declarative_base()
 
@@ -102,17 +102,20 @@ class Storage:
 
 
 class UserApp(QMainWindow, userapp.Ui_MainWindow):
+    user_chat = None
+    user_name = None
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.commandLinkButton_2.clicked.connect(self.update_contact_list)
         self.commandLinkButton.clicked.connect(self.send_message)
         self.lineEdit.returnPressed.connect(self.send_message)
-        self.user_chat = None
-        self.user_name = None
         self.listWidget.itemDoubleClicked.connect(self.open_chat)
-        r = Thread(target=self.rec_message, daemon=True)
-        r.start()
+        self.thread = QtCore.QThread()
+        self.rec_message = RecMessage()
+        self.rec_message.moveToThread(self.thread)
+        self.thread.start()
         self.update_contact_list()
 
     def update_contact_list(self):
@@ -127,8 +130,8 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
             for k, v in data.items():
                 item = QListWidgetItem()
                 item.guid = int(k)
-                item.name = self.user_name = v.get("user_name")
-                item.setText(f'{self.user_name}')
+                item.name = v.get("user_name")
+                item.setText(f'{item.name}')
                 icon = QtGui.QIcon()
                 icon.addPixmap(QtGui.QPixmap("user.png"),
                                QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -136,16 +139,21 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
                 self.listWidget.addItem(item)
 
             layout.addWidget(self.listWidget)
-
         else:
-            QMessageBox.warning(
-                self, 'Error', 'Упс, что-то пошло не так')
+            self.dialog_message('Error', 'Упс, что-то пошло не так')
+
+    def run_check_message(self):
+        self.thread.started.connect(self.rec_message.rec_message())
 
     def open_chat(self):
         self.listWidget_2.clear()
         if self.listWidget:
             self.user_chat = self.listWidget.currentItem().guid
             self.user_name = self.listWidget.currentItem().name
+            self.update_chat()
+
+    def update_chat(self):
+        if self.user_chat:
             req = {'action': 'read_messages',
                    'guid': self.user_chat,
                    'time': f'{datetime.now()}'}
@@ -165,10 +173,9 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
 
             layout = QVBoxLayout()
             layout.addWidget(self.listWidget_2)
-
-        else:
-            QMessageBox.warning(
-                self, 'Error', 'Упс, что-то пошло не так')
+        #
+        # else:
+        #     self.dialog_message('Error', 'Упс, что-то пошло не так')
 
     def send_message(self):
         message_text = self.lineEdit.text()
@@ -184,10 +191,16 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
             if resp.get('response') == 200:
                 self.open_chat()
         else:
-            QMessageBox.warning(
-                self, 'Error', 'Введите сообщение')
+            self.dialog_message('Error', 'Введите сообщение')
 
-    def rec_message(self):
+    def dialog_message(self, type, alert):
+        QMessageBox.information(
+            self, type, alert)
+
+
+class RecMessage(QtCore.QObject):
+    @staticmethod
+    def rec_message():
         while True:
             try:
                 req = front_output_queue.queue[0]
@@ -196,10 +209,10 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
                     from_user_name = request.get("from_user_name")
                     from_guid = request.get("from_user_id")
                     message = request.get("message_text")
-                    QMessageBox.information(
-                        self, 'Message', f'У Вас новое сообщение от {from_user_name}:{message}')
-                    if self.user_chat == int(from_guid):
-                        self.open_chat()
+                    alert = f'У Вас новое сообщение от {from_user_name}:{message}'
+                    UserApp().dialog_message('Message', alert)
+                    if UserApp().user_chat == int(from_guid):
+                        UserApp().open_chat()
                 else:
                     pass
             except IndexError:
@@ -319,10 +332,6 @@ class Client:
             return send_message_msg
 
         if group is None:
-            # to_guid = int(input('Введите кому пишем: '))
-            # message = 'Личное:' + input('Введите ваше ссобщение: ')
-            # smsg = self.get_list()
-            # to_user_name = smsg.get(f'{to_guid}').get('user_name')
             front_reg_resp_msg = {
                 'action': 'send_message',
                 'time': f'{datetime.now()}',
@@ -331,15 +340,6 @@ class Client:
             front_output_queue.put(front_reg_resp_msg)
             self.db.save_message(from_user_id=self.guid, to_user_id=to_guid, text_message=message)
             self.send(create_message(to_user_name, to_guid, message))
-
-        # elif group is not None:
-        #     message = 'Групповое:' + input('Введите ваше ссобщение: ')
-        #     smsg = self.get_list()
-        #     for to_guid, v in smsg.items():
-        #         if str(v.get('group')) == self.usr_group:
-        #             to_user_name = v.get('user_name')
-        #             self.db.save_message(from_user_id=self.guid, to_user_id=to_guid, text_message=message)
-        #             self.send(create_message())
 
     def front_api(self):
         while True:
@@ -548,6 +548,8 @@ if __name__ == "__main__":
     ui_app = QApplication(sys.argv)  # Новый экземпляр QApplication
     login = Login()
     if login.exec_() == QDialog.Accepted:
-        window = UserApp()  # Создаём объект класса для старта потока AdminApp
-        window.show()  # Показываем окно
-        ui_app.exec_()  # и запускаем приложение
+        window = UserApp()  # Создаём объект класса для старта потока
+        window.show()
+        ui_app.exec_()
+        sys.exit(window.run_check_message())
+

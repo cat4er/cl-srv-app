@@ -423,7 +423,7 @@ class Chat(Thread):
 
 
 class Main:
-    PORT = 8007
+    PORT = 8009
 
     def __init__(self, cl_list, slt):
         self.salt = slt
