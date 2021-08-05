@@ -16,12 +16,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QDialog, QMessageBox, QLineEdit, QPushButton, \
     QVBoxLayout, QListWidgetItem
 from PyQt5 import QtGui, QtCore
+from PyQt5.QtCore import QObject, pyqtSignal
 import userapp
 
 front_input_queue = PriorityQueue()
 front_output_queue = PriorityQueue()
 # config
-PORT = 8009
+PORT = 8006
 
 Base = declarative_base()
 
@@ -102,19 +103,22 @@ class Storage:
 
 
 class UserApp(QMainWindow, userapp.Ui_MainWindow):
-    user_chat = None
-    user_name = None
 
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.user_chat = None
+        self.user_name = None
         self.commandLinkButton_2.clicked.connect(self.update_contact_list)
         self.commandLinkButton.clicked.connect(self.send_message)
         self.lineEdit.returnPressed.connect(self.send_message)
         self.listWidget.itemDoubleClicked.connect(self.open_chat)
         self.thread = QtCore.QThread()
         self.rec_message = RecMessage()
+        self.rec_message.gotData.connect(self.dialog_message)
+        self.rec_message.gotSignal.connect(self.update_chat)
         self.rec_message.moveToThread(self.thread)
+        self.thread.started.connect(self.rec_message.rec_message)
         self.thread.start()
         self.update_contact_list()
 
@@ -142,18 +146,15 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
         else:
             self.dialog_message('Error', 'Упс, что-то пошло не так')
 
-    def run_check_message(self):
-        self.thread.started.connect(self.rec_message.rec_message())
-
     def open_chat(self):
-        self.listWidget_2.clear()
         if self.listWidget:
             self.user_chat = self.listWidget.currentItem().guid
             self.user_name = self.listWidget.currentItem().name
-            self.update_chat()
+            self.update_chat(self.user_chat)
 
-    def update_chat(self):
-        if self.user_chat:
+    def update_chat(self, from_guid):
+        self.listWidget_2.clear()
+        if self.user_chat == from_guid:
             req = {'action': 'read_messages',
                    'guid': self.user_chat,
                    'time': f'{datetime.now()}'}
@@ -173,9 +174,10 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
 
             layout = QVBoxLayout()
             layout.addWidget(self.listWidget_2)
-        #
-        # else:
-        #     self.dialog_message('Error', 'Упс, что-то пошло не так')
+
+        else:
+            pass
+            # self.dialog_message('Error', 'Упс, что-то пошло не так')
 
     def send_message(self):
         message_text = self.lineEdit.text()
@@ -189,7 +191,7 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
             self.lineEdit.clear()
             resp = front_output_queue.get()
             if resp.get('response') == 200:
-                self.open_chat()
+                self.update_chat(self.user_chat)
         else:
             self.dialog_message('Error', 'Введите сообщение')
 
@@ -198,21 +200,25 @@ class UserApp(QMainWindow, userapp.Ui_MainWindow):
             self, type, alert)
 
 
-class RecMessage(QtCore.QObject):
-    @staticmethod
-    def rec_message():
+class RecMessage(QObject):
+    gotData = pyqtSignal(str, str)
+    gotSignal = pyqtSignal(int)
+
+    def __init__(self):
+        super().__init__()
+
+    def rec_message(self):
         while True:
             try:
                 req = front_output_queue.queue[0]
                 if req.get('action') == 'rec_message':
                     request = front_output_queue.get()
                     from_user_name = request.get("from_user_name")
-                    from_guid = request.get("from_user_id")
+                    from_guid = int(request.get("from_user_id"))
                     message = request.get("message_text")
                     alert = f'У Вас новое сообщение от {from_user_name}:{message}'
-                    UserApp().dialog_message('Message', alert)
-                    if UserApp().user_chat == int(from_guid):
-                        UserApp().open_chat()
+                    self.gotData.emit('Message', alert)
+                    self.gotSignal.emit(from_guid)
                 else:
                     pass
             except IndexError:
@@ -550,6 +556,5 @@ if __name__ == "__main__":
     if login.exec_() == QDialog.Accepted:
         window = UserApp()  # Создаём объект класса для старта потока
         window.show()
-        ui_app.exec_()
-        sys.exit(window.run_check_message())
+        sys.exit(ui_app.exec_())
 
