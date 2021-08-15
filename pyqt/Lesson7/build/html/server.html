@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>server module &#8212; документация PyQt-chat 001</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="userapp module" href="userapp.html" />
+    <link rel="prev" title="client module" href="client.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-server">
+<span id="server-module"></span><h1>server module<a class="headerlink" href="#module-server" title="Ссылка на этот заголовок">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="server.AdminApp">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">AdminApp</span></span><a class="reference internal" href="_modules/server.html#AdminApp"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.AdminApp" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QMainWindow</span></code>, <a class="reference internal" href="adminapp.html#adminapp.Ui_MainWindow" title="adminapp.Ui_MainWindow"><code class="xref py py-class docutils literal notranslate"><span class="pre">adminapp.Ui_MainWindow</span></code></a></p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="server.AdminApp.storage_info">
+<span class="sig-name descname"><span class="pre">storage_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#AdminApp.storage_info"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.AdminApp.storage_info" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Chat">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Chat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></p>
+</div></blockquote>
+<p>Задача класса отпочковаться, получить сессию сокета и слушать ее до закрытия</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.check_encrypted_request">
+<span class="sig-name descname"><span class="pre">check_encrypted_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.check_encrypted_request"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.check_encrypted_request" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.create_group">
+<span class="sig-name descname"><span class="pre">create_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.create_group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.create_group" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.exit_of_group">
+<span class="sig-name descname"><span class="pre">exit_of_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.exit_of_group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.exit_of_group" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.get_user_list">
+<span class="sig-name descname"><span class="pre">get_user_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.get_user_list"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.get_user_list" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.leave">
+<span class="sig-name descname"><span class="pre">leave</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.leave"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.leave" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Метод выхода из чата(закрывает сокет, удаляет клиентскую запись, убивает экземпляр класса и поток)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.login_required">
+<span class="sig-name descname"><span class="pre">login_required</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.login_required"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.login_required" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Проверяет залогинен ли пользователь сейчас</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.main">
+<span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.main"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.main" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Транслирует запросы по другим методам</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.new_session">
+<span class="sig-name descname"><span class="pre">new_session</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.new_session"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.new_session" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Для новой сессии генереруется публичный 32 битный ключ</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.open_group">
+<span class="sig-name descname"><span class="pre">open_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.open_group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.open_group" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.padding_text">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">padding_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.padding_text"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.padding_text" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Выравнивание сообщения до длины, кратной 16 байтам. В данном случае исходное сообщение дополняется
+пробелами</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.rec_message">
+<span class="sig-name descname"><span class="pre">rec_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.rec_message"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.rec_message" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Метод получает ответ от пользваотеля на сообщение и направляет его отправителю, как подтверждение.
+Выполняет роль маршрутизатора</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.registration">
+<span class="sig-name descname"><span class="pre">registration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.registration"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.registration" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Запись в словарь основных данных по классу: id, pub_key, socket, имя пользователя</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.request">
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.request"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.request" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Метод получения запроса</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.response">
+<span class="sig-name descname"><span class="pre">response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.response"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.response" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Метод отправки унифицированного ответа</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.run"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.run" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Запуск потока</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.save_event">
+<span class="sig-name descname"><span class="pre">save_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.save_event"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.save_event" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.send_message">
+<span class="sig-name descname"><span class="pre">send_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.send_message"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.send_message" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Chat.show_group">
+<span class="sig-name descname"><span class="pre">show_group</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Chat.show_group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Chat.show_group" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Метод отображения доступных групп</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Group">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Group" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.decl_api.Base</span></code></p>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Group.create_time">
+<span class="sig-name descname"><span class="pre">create_time</span></span><a class="headerlink" href="#server.Group.create_time" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Group.group_id">
+<span class="sig-name descname"><span class="pre">group_id</span></span><a class="headerlink" href="#server.Group.group_id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Group.group_name">
+<span class="sig-name descname"><span class="pre">group_name</span></span><a class="headerlink" href="#server.Group.group_name" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Group.owner_user_id">
+<span class="sig-name descname"><span class="pre">owner_user_id</span></span><a class="headerlink" href="#server.Group.owner_user_id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.History">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">History</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#History"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.History" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.decl_api.Base</span></code></p>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.History.create_time">
+<span class="sig-name descname"><span class="pre">create_time</span></span><a class="headerlink" href="#server.History.create_time" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.History.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#server.History.event_id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.History.event_type">
+<span class="sig-name descname"><span class="pre">event_type</span></span><a class="headerlink" href="#server.History.event_type" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.History.ip_address">
+<span class="sig-name descname"><span class="pre">ip_address</span></span><a class="headerlink" href="#server.History.ip_address" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.History.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#server.History.user_id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Main">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Main</span></span><a class="reference internal" href="_modules/server.html#Main"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Main" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Main.PORT">
+<span class="sig-name descname"><span class="pre">PORT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">8009</span></em><a class="headerlink" href="#server.Main.PORT" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Main.check_user">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">check_user</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Main.check_user"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Main.check_user" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Проверяет доступен ли клиент на сервере, и если нет, то закрывает сокет, удаляет клиентскую запись,
+экземплятр класса и поток</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Main.create_thread">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">create_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Main.create_thread"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Main.create_thread" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Создание отдельно потока с экземпляром класса: 1 клиент = 1 поток</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Main.main">
+<span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Main.main"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Main.main" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Задача функции: открыть сессию, сделать поток пользователя, проверять онлайн ли он</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Message">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Message"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Message" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.decl_api.Base</span></code></p>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Message.create_time">
+<span class="sig-name descname"><span class="pre">create_time</span></span><a class="headerlink" href="#server.Message.create_time" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Message.from_user_id">
+<span class="sig-name descname"><span class="pre">from_user_id</span></span><a class="headerlink" href="#server.Message.from_user_id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Message.message_id">
+<span class="sig-name descname"><span class="pre">message_id</span></span><a class="headerlink" href="#server.Message.message_id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Message.text_message">
+<span class="sig-name descname"><span class="pre">text_message</span></span><a class="headerlink" href="#server.Message.text_message" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.Message.to_user_id">
+<span class="sig-name descname"><span class="pre">to_user_id</span></span><a class="headerlink" href="#server.Message.to_user_id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.Storage">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">Storage</span></span><a class="reference internal" href="_modules/server.html#Storage"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</div></blockquote>
+<p>Класс методов по управлению хранилищем</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.add_new_event">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">add_new_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.datetime(2021,</span> <span class="pre">8,</span> <span class="pre">15,</span> <span class="pre">17,</span> <span class="pre">17,</span> <span class="pre">1,</span> <span class="pre">216715)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.add_new_event"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.add_new_event" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод добавления нового события в БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.add_new_group">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">add_new_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner_user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.datetime(2021,</span> <span class="pre">8,</span> <span class="pre">15,</span> <span class="pre">17,</span> <span class="pre">17,</span> <span class="pre">1,</span> <span class="pre">216715)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.add_new_group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.add_new_group" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод добавления новой группы в БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.add_new_user">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">add_new_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.datetime(2021,</span> <span class="pre">8,</span> <span class="pre">15,</span> <span class="pre">17,</span> <span class="pre">17,</span> <span class="pre">1,</span> <span class="pre">216708)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.add_new_user"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.add_new_user" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод добавления нового пользователя в БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.clean_all_table">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">clean_all_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.clean_all_table"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.clean_all_table" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.del_group">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">del_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.del_group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.del_group" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод удаления группы</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.del_user">
+<span class="sig-name descname"><span class="pre">del_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.del_user"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.del_user" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод удаления пользователя из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.get_group">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.get_group"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.get_group" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод получения группы из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.get_groups_count">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_groups_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.get_groups_count"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.get_groups_count" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод получения количества групп из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.get_groups_list">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_groups_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.get_groups_list"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.get_groups_list" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод получения групп из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.get_messages_count">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_messages_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.get_messages_count"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.get_messages_count" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод получения количества сообщений из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.get_user">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.get_user"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.get_user" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод получения пользователя из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.get_user_list">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_user_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.get_user_list"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.get_user_list" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод получения пользователей из БД со всеми параметрами</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.get_users_count">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_users_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.get_users_count"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.get_users_count" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод получения количества сообщений из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.read_messages">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">read_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">guid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.read_messages"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.read_messages" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод чтения сообщений пользователя из БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.save_message">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.datetime(2021,</span> <span class="pre">8,</span> <span class="pre">15,</span> <span class="pre">17,</span> <span class="pre">17,</span> <span class="pre">1,</span> <span class="pre">216713)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.save_message"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.save_message" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод добавления нового сообщения в БД</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="server.Storage.update_user_data">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">update_user_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#Storage.update_user_data"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.Storage.update_user_data" title="Ссылка на это определение">¶</a></dt>
+<dd><p>метод обновления пользователей из БД со всеми параметрами</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="server.User">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#User"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.User" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.decl_api.Base</span></code></p>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.User.create_time">
+<span class="sig-name descname"><span class="pre">create_time</span></span><a class="headerlink" href="#server.User.create_time" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.User.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#server.User.id" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.User.password">
+<span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#server.User.password" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.User.pub_key">
+<span class="sig-name descname"><span class="pre">pub_key</span></span><a class="headerlink" href="#server.User.pub_key" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.User.user_group">
+<span class="sig-name descname"><span class="pre">user_group</span></span><a class="headerlink" href="#server.User.user_group" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.User.user_name">
+<span class="sig-name descname"><span class="pre">user_name</span></span><a class="headerlink" href="#server.User.user_name" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="server.User.user_status">
+<span class="sig-name descname"><span class="pre">user_status</span></span><a class="headerlink" href="#server.User.user_status" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="server.log">
+<span class="sig-prename descclassname"><span class="pre">server.</span></span><span class="sig-name descname"><span class="pre">log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/server.html#log"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#server.log" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Логирование взаимодействий между функциями</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PyQt-chat</a></h1>
+
+
+
+
+
+
+
+
+<h3>Навигация</h3>
+<p class="caption"><span class="caption-text">Содержание:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="adminapp.html">adminapp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="client.html">client module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">server module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="userapp.html">userapp module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">src</a><ul>
+      <li>Previous: <a href="client.html" title="предыдущая глава">client module</a></li>
+      <li>Next: <a href="userapp.html" title="следующая глава">userapp module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Быстрый поиск</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Искать" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Victor Pavlyuk.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/server.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
